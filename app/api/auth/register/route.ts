@@ -43,12 +43,23 @@ async function verifyTurnstile(token: string) {
   );
 
   if (!response.ok) {
+    console.error("Turnstile siteverify HTTP error:", response.status);
     return false;
   }
 
   const result = (await response.json()) as {
     success?: boolean;
+    "error-codes"?: string[];
   };
+
+  if (result.success !== true) {
+    console.error(
+      "Turnstile validation failed:",
+      Array.isArray(result["error-codes"])
+        ? result["error-codes"]
+        : ["unknown-error"]
+    );
+  }
 
   return result.success === true;
 }
